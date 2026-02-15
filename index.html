@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMBER & ASH - Artisanal Coffee Roasters</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ash: #1a1511;
+            --ember: #d4734b;
+            --cream: #f4ebe1;
+            --smoke: #5a4a42;
+            --gold: #c9a96e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--cream);
+            color: var(--ash);
+            overflow-x: hidden;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: 1000;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, var(--cream) 0%, rgba(244, 235, 225, 0) 100%);
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--ash);
+        }
+
+        nav {
+            display: flex;
+            gap: 3rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: var(--smoke);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--ember);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--ember);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(4rem, 12vw, 10rem);
+            font-weight: 300;
+            line-height: 0.9;
+            color: var(--ash);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero h1 strong {
+            font-weight: 700;
+            display: block;
+            background: linear-gradient(135deg, var(--ember) 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero p {
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--smoke);
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(212, 115, 75, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.3;
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--smoke);
+            animation: fadeInUp 1s ease-out 0.9s both, float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* Products Section */
+        .products {
+            padding: 8rem 4rem;
+            background: var(--ash);
+            color: var(--cream);
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 4rem;
+            letter-spacing: 0.05em;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            position: relative;
+            padding: 3rem 2rem;
+            background: rgba(244, 235, 225, 0.03);
+            border: 1px solid rgba(244, 235, 225, 0.1);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--ember) 0%, var(--gold) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--ember);
+        }
+
+        .product-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .product-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .product-number {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .product-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--cream);
+        }
+
+        .product-origin {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--smoke);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-description {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(244, 235, 225, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .product-notes {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .note {
+            font-size: 0.7rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(244, 235, 225, 0.2);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* About Section */
+        .about {
+            padding: 8rem 4rem;
+            background: var(--cream);
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        .about-text p {
+            font-size: 0.9rem;
+            line-height: 2;
+            color: var(--smoke);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-stat {
+            display: inline-block;
+            margin-right: 3rem;
+            margin-top: 2rem;
+        }
+
+        .about-stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--ember);
+            display: block;
+        }
+
+        .about-stat-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--smoke);
+        }
+
+        .about-image {
+            position: relative;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, var(--smoke) 0%, var(--ash) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 8rem;
+            font-weight: 300;
+            color: rgba(244, 235, 225, 0.1);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 8rem 4rem;
+            background: var(--ember);
+            color: var(--cream);
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .cta p {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: var(--cream);
+            color: var(--ash);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 2px solid var(--cream);
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--cream);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem;
+            background: var(--ash);
+            color: var(--cream);
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 2rem;
+            }
+
+            nav {
+                gap: 1.5rem;
+                font-size: 0.65rem;
+            }
+
+            .products, .about, .cta {
+                padding: 4rem 2rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">EMBER & ASH</div>
+        <nav>
+            <a href="#products">Coffee</a>
+            <a href="#about">Story</a>
+            <a href="#cta">Subscribe</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>
+                Roasted with
+                <strong>INTENTION</strong>
+            </h1>
+            <p>Small Batch · Single Origin · Craft Roasted</p>
+        </div>
+        <div class="scroll-indicator">Scroll to Explore</div>
+    </section>
+
+    <section class="products" id="products">
+        <h2 class="section-title">Current Offerings</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-number">NO. 01</div>
+                <h3 class="product-name">Midnight Sun</h3>
+                <div class="product-origin">Ethiopia · Yirgacheffe</div>
+                <p class="product-description">A luminous medium roast that dances between floral bergamot and wild honey sweetness, with whispers of jasmine in the finish.</p>
+                <div class="product-notes">
+                    <span class="note">Floral</span>
+                    <span class="note">Honey</span>
+                    <span class="note">Citrus</span>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-number">NO. 02</div>
+                <h3 class="product-name">Stone & Fire</h3>
+                <div class="product-origin">Guatemala · Huehuetenango</div>
+                <p class="product-description">Bold and grounding. This dark roast embraces rich cocoa and toasted walnut, balanced with a hint of burnt caramel complexity.</p>
+                <div class="product-notes">
+                    <span class="note">Cocoa</span>
+                    <span class="note">Walnut</span>
+                    <span class="note">Caramel</span>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-number">NO. 03</div>
+                <h3 class="product-name">Wild Ember</h3>
+                <div class="product-origin">Colombia · Tolima</div>
+                <p class="product-description">An adventurous light roast showcasing bright red fruit acidity, brown sugar sweetness, and a silky body that lingers beautifully.</p>
+                <div class="product-notes">
+                    <span class="note">Berry</span>
+                    <span class="note">Sugar</span>
+                    <span class="note">Bright</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>Crafted in small batches, roasted with care</h2>
+                <p>We source directly from farmers who share our commitment to quality and sustainability. Each bean is selected for its unique terroir and flavor potential.</p>
+                <p>Our roasting philosophy is simple: honor the bean. We use vintage Probat roasters to coax out the inherent beauty in each origin, creating profiles that tell the story of the land.</p>
+                <div class="about-stats">
+                    <div class="about-stat">
+                        <span class="about-stat-number">8</span>
+                        <span class="about-stat-label">Partner Farms</span>
+                    </div>
+                    <div class="about-stat">
+                        <span class="about-stat-number">12</span>
+                        <span class="about-stat-label">Years Roasting</span>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                &
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="cta">
+        <h2>Never run out</h2>
+        <p>Join our subscription service</p>
+        <a href="#" class="btn" onclick="alert('This is a demo website - subscription feature coming soon!'); return false;">Subscribe Now</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Ember & Ash Coffee Roasters · Demo Website for Portfolio Use</p>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.product-card, .about-content').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
